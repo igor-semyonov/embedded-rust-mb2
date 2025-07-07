@@ -3,31 +3,34 @@
 
 use cortex_m_rt::entry;
 use embedded_hal::{delay::DelayNs, digital::OutputPin};
-use nrf52833_hal::{gpio, pac, timer};
+use microbit::hal::{gpio, timer};
 use panic_halt as _;
 
 #[entry]
 fn main() -> ! {
-    let peripherals = pac::Peripherals::take().unwrap();
-    let p0 = gpio::p0::Parts::new(peripherals.P0);
-    let _row1 = p0
-        .p0_21
-        .into_push_pull_output(gpio::Level::High);
-    let mut row2 = p0
-        .p0_24
-        .into_push_pull_output(gpio::Level::Low);
-    let _col1 = p0
-        .p0_28
-        .into_push_pull_output(gpio::Level::Low);
+    let board = microbit::Board::take().unwrap();
 
-    let mut timer = timer::Timer::new(peripherals.TIMER0);
+    let _row1 = board
+        .display_pins
+        .row1
+        .into_push_pull_output(gpio::Level::High);
+    let _col1 = board
+        .display_pins
+        .col1
+        .into_push_pull_output(gpio::Level::Low);
+    let mut row5 = board
+        .display_pins
+        .row5
+        .into_push_pull_output(gpio::Level::High);
+
+    let mut timer = timer::Timer::new(board.TIMER0);
 
     loop {
-        timer.delay_ms(500);
-        row2.set_high()
+        timer.delay_ms(100);
+        row5.set_high()
             .unwrap();
-        timer.delay_ms(500);
-        row2.set_low()
+        timer.delay_ms(100);
+        row5.set_low()
             .unwrap();
     }
 }
